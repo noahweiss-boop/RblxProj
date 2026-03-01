@@ -5,107 +5,114 @@
   <title>Roblox Projects</title>
 
   <style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-    color: #ffffff;
-    text-align: center;
-    position: relative;
-    overflow-x: hidden;
-  }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #ffffff;
+      text-align: center;
+      position: relative;
+      overflow-x: hidden;
+    }
 
-  /* Blurred background image */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("bkg.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: blur(12px) brightness(0.6);
-    transform: scale(1.1); /* prevents blur edges */
-    z-index: -1;
-  }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("bkg.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(18px) brightness(0.55);
+      transform: scale(1.15);
+      z-index: -2;
+    }
 
-  header {
-    padding: 60px 20px 40px;
-  }
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        rgba(0, 0, 0, 0.45),
+        rgba(0, 0, 0, 0.65)
+      );
+      z-index: -1;
+    }
 
-  h1 {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    letter-spacing: 1px;
-  }
+    header {
+      padding: 60px 20px 40px;
+    }
 
-  .username a {
-    font-size: 1.4rem;
-    color: #00d4ff;
-    text-decoration: none;
-    font-weight: bold;
-  }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
 
-  .username a:hover {
-    color: #7af0ff;
-    text-shadow: 0 0 8px #00d4ff;
-  }
+    table {
+      width: 90%;
+      max-width: 900px;
+      margin: 40px auto;
+      border-collapse: collapse;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      overflow: hidden;
+    }
 
-  .projects-section {
-    margin-top: 40px;
-    padding: 20px;
-  }
+    th, td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
 
-  .card {
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 25px;
-    width: 80%;
-    max-width: 600px;
-    margin: 20px auto;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  }
+    th {
+      background: rgba(255, 255, 255, 0.15);
+      font-size: 1.1rem;
+    }
 
-  footer {
-    margin-top: 60px;
-    padding: 20px;
-    font-size: 0.9rem;
-    opacity: 0.85;
-  }
+    tr:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
 
-  footer a {
-    color: #00d4ff;
-    text-decoration: none;
-    font-weight: bold;
-  }
+    footer {
+      margin-top: 60px;
+      padding: 20px;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
 
-  footer a:hover {
-    color: #7af0ff;
-  }
-</style>
-
+    footer a {
+      color: #00d4ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
   <header>
     <h1>My Roblox Projects</h1>
-    <div class="username">
-      <a href="https://www.roblox.com/users/7068332763/profile" target="_blank">
-        cre4te_it
-      </a>
-    </div>
   </header>
 
-  <section class="projects-section">
-    <div class="card">
-      <h2>Featured Projects</h2>
-      <p>Coming soon...</p>
-    </div>
-  </section>
+  <table id="gameTable">
+    <thead>
+      <tr>
+        <th>Universe ID</th>
+        <th>Name</th>
+        <th>Creator</th>
+        <th>Visits</th>
+        <th>Playing</th>
+        <th>Coming Soon?</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <footer>
     Made by 
@@ -113,5 +120,40 @@
       cre4te_it
     </a>
   </footer>
+
+  <script>
+    // Your project list
+    const projects = [
+      { id: 123456789, comingSoon: true },
+      { id: 987654321, comingSoon: false }
+    ];
+
+    async function loadGames() {
+      const tableBody = document.querySelector("#gameTable tbody");
+
+      for (const project of projects) {
+        const url = `https://games.roblox.com/v1/games?universeIds=${project.id}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const game = data.data[0];
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${project.id}</td>
+          <td>${game.name}</td>
+          <td>${game.creator.name}</td>
+          <td>${game.visits.toLocaleString()}</td>
+          <td>${game.playing.toLocaleString()}</td>
+          <td>${project.comingSoon ? "Yes" : "No"}</td>
+        `;
+
+        tableBody.appendChild(row);
+      }
+    }
+
+    loadGames();
+  </script>
+
 </body>
 </html>

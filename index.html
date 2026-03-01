@@ -120,39 +120,55 @@
       cre4te_it
     </a>
   </footer>
+<script>
+const projects = [
+  { id: 9185275337, comingSoon: true },
+  { id: 1234567890, comingSoon: false }
+];
 
-  <script>
-    // Your project list
-    const projects = [
-      { id: 9185275337, comingSoon: false },
-    ];
+async function loadGames() {
+  const tableBody = document.querySelector("#gameTable tbody");
 
-    async function loadGames() {
-      const tableBody = document.querySelector("#gameTable tbody");
+  for (const project of projects) {
+    const apiURL = `https://games.roblox.com/v1/games?universeIds=${project.id}`;
+    const proxiedURL = `https://corsproxy.io/?${encodeURIComponent(apiURL)}`;
 
-      for (const project of projects) {
-        const url = `https://games.roblox.com/v1/games?universeIds=${project.id}`;
-        const response = await fetch(url);
-        const data = await response.json();
+    try {
+      const response = await fetch(proxiedURL);
+      const data = await response.json();
 
-        const game = data.data[0];
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${project.id}</td>
-          <td>${game.name}</td>
-          <td>${game.creator.name}</td>
-          <td>${game.visits.toLocaleString()}</td>
-          <td>${game.playing.toLocaleString()}</td>
-          <td>${project.comingSoon ? "Yes" : "No"}</td>
-        `;
-
-        tableBody.appendChild(row);
+      if (!data.data || !data.data[0]) {
+        throw new Error("Invalid universe ID");
       }
-    }
 
-    loadGames();
-  </script>
+      const game = data.data[0];
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${project.id}</td>
+        <td>${game.name}</td>
+        <td>${game.creator.name}</td>
+        <td>${game.visits.toLocaleString()}</td>
+        <td>${game.playing.toLocaleString()}</td>
+        <td>${project.comingSoon ? "Yes" : "No"}</td>
+      `;
+
+      tableBody.appendChild(row);
+
+    } catch (err) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${project.id}</td>
+        <td colspan="5" style="color: #ff6b6b;">Failed to load game data</td>
+      `;
+      tableBody.appendChild(row);
+    }
+  }
+}
+
+loadGames();
+</script>
+
 
 </body>
 </html>
